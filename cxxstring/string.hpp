@@ -2,47 +2,49 @@
 //@	"targets":[{"name":"string.hpp","type":"include"}]
 //@	}
 
-#ifndef ANNALIB_STRING_HPP
+#ifndef ANALIB_STRING_HPP
 #define ANALIB_STRING_HPP
 
 #include <memory>
 
 namespace Analib
 	{
-	template<template<class> class BaseContainer, class ... ContainerArgs>
-	class String:private BaseContainer<char, ContainerArgs...>
+	template<class CharT, class Container>
+	class String : private Container
 		{
 		public:
-			using Base = BaseContainer<char, ContainerArgs...>;
-			using Base::begin;
-			using Base::end;
-			using Base::capacity;
-			using Base::size;
-			using Base::reserve;
-			using Base::data;
+			using Container::begin;
+			using Container::end;
+			using Container::capacity;
+			using Container::size;
+			using Container::reserve;
+			using Container::data;
 
-			explicit String(char const* cstr)
+			explicit String(CharT const* cstr)
 				{append(cstr);}
 
 			template<class InputIterator>
 			explicit String(InputIterator begin, InputIterator end)
 				{append(begin, end);}
 
-			String& append(const char* cstr);
+			String& append(const CharT* cstr);
 			String& append(String const& str)
 				{return append(str.begin(), str.end());}
 
 			template<class InputIterator>
 			String& append(InputIterator begin, InputIterator end);
 
-			auto const& representation() const noexcept
-				{return static_cast<Base const&>(*this);}
+			String& append(CharT ch)
+				{
+				Container::push_back(ch);
+				return *this;
+				}
 		};
 
 
-	template<template<class> class BaseContainer, class ... ContainerArgs>
+	template<class CharT, class Container>
 	template<class InputIterator>
-	String<BaseContainer, ContainerArgs...>& String<BaseContainer, ContainerArgs...>::append(InputIterator begin, InputIterator end)
+	String<CharT, Container>& String<CharT,Container>::append(InputIterator begin, InputIterator end)
 		{
 		reserve(size() + std::distance(begin, end));
 		while(begin!=end)
@@ -54,32 +56,8 @@ namespace Analib
 		}
 
 
-	template<template<class> class BaseContainer, class ... ContainerArgs>
-	std::unique_ptr<char const[]> make_cstr(String<BaseContainer, ContainerArgs...> const& str);
-
-	template<template<class> class BaseContainer, class ... ContainerArgs>
-	inline bool operator==(String<BaseContainer, ContainerArgs...> const& a, String<BaseContainer, ContainerArgs...> const& b)
-		{return a.representation() == b.representation();}
-
-	template<template<class> class BaseContainer, class ... ContainerArgs>
-	inline bool operator!=(String<BaseContainer, ContainerArgs...> const& a, String<BaseContainer, ContainerArgs...> const& b)
-		{return a.representation() != b.representation();}
-
-
-	template<template<class> class BaseContainer, class ... ContainerArgs>
-	bool operator!=(String<BaseContainer, ContainerArgs...> const& a, char const* b) noexcept;
-
-	template<template<class> class BaseContainer, class ... ContainerArgs>
-	inline bool operator!=(char const* a, String<BaseContainer, ContainerArgs...> const& b)
-		{return b != a;}
-
-	template<template<class> class BaseContainer, class ... ContainerArgs>
-	inline bool operator==(String<BaseContainer, ContainerArgs...> const& a, char const* b)
-		{return !(a != b);}
-
-	template<template<class> class BaseContainer, class ... ContainerArgs>
-	inline bool operator==(char const* a, String<BaseContainer, ContainerArgs...> const& b)
-		{return b==a;}
+	template<class CharT, class Container>
+	std::unique_ptr<char const[]> make_cstr(String<CharT, Container> const& str);
 
 	}
 
