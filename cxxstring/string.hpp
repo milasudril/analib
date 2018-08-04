@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <algorithm>
 
 namespace Analib
 	{
@@ -63,6 +64,8 @@ namespace Analib
 	template<class CharT, class Container>
 	std::unique_ptr<char const[]> make_cstr(BasicString<CharT, Container> const& str)
 		{
+		if(std::find(str.begin(), str.end(), static_cast<CharT>(0)) != str.end())
+			{return nullptr;}
 		auto ret = std::make_unique<char []>(str.size() + 1);
 		std::copy(str.begin(), str.end(), ret.get());
 		*(ret.get() + str.size()) = static_cast<CharT>(0);

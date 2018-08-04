@@ -26,6 +26,9 @@ void stringTest()
 	assert(copy.append(stringFromCstr)=="Hello WorldHello, World");
 
 	assert(strcmp(make_cstr(TestType{teststr}).get(), teststr) == 0);
+
+	copy.append('\0');
+	assert(make_cstr(copy) == nullptr);
 	}
 
 int main()
