@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <list>
 
 static char const teststr[]="Hello, World";
 
@@ -20,6 +21,7 @@ void stringTest()
 	assert("Hello, World" == stringFromRange);
 
 	auto copy = stringFromRange;
+	assert(&(*std::begin(copy)) != &(*std::begin(stringFromRange)));
 	assert(stringFromRange.append("More text") != copy);
 	assert(stringFromRange != "Hello, World");
 
@@ -29,11 +31,22 @@ void stringTest()
 
 	copy.append('\0');
 	assert(make_cstr(copy) == nullptr);
+
+#if __cplusplus >= 201703L
+	auto strview = stringFromCstr.string_view();
+	auto copy2 = stringFromCstr;
+	assert(strview == copy2);
+	assert(copy2 == strview);
+	copy2.append("Hello");
+	assert(strview != copy2);
+	assert(copy2 != strview);
+#endif
 	}
 
 int main()
 	{
 	stringTest<Analib::DefaultString>();
 	stringTest<Analib::StringNoSso>();
+	stringTest<Analib::BasicString<char, std::list<char>>>();
 	return 0;
 	}

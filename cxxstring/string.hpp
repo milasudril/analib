@@ -45,6 +45,12 @@ namespace Analib
 
 			bool operator==(BasicString const& other) const
 				{return *this == static_cast<Container const&>(other);}
+
+
+#if __cplusplus >= 201703L
+			auto string_view() const
+				{return std::basic_string_view<CharT>{Container::data(), size()};}
+#endif
 		};
 
 
@@ -104,8 +110,23 @@ namespace Analib
 	bool operator!=(CharT const* cstr, BasicString<CharT, Container> const& a)
 		{return cstr != a;}
 
-	using StringNoSso = BasicString<char, std::vector<char>>;
-	using DefaultString = BasicString<char, std::string>;
+#if __cplusplus>=201703L
+	template<class CharT, class Container>
+	inline bool operator==(BasicString<CharT, Container> const& a, std::basic_string_view<CharT> b)
+		{return a.string_view() == b;}
+
+	template<class CharT, class Container>
+	inline bool operator!=(BasicString<CharT, Container> const& a, std::basic_string_view<CharT> b)
+		{return !(a.string_view() == b);}
+
+	template<class CharT, class Container>
+	inline bool operator==(std::basic_string_view<CharT> a, BasicString<CharT, Container> const& b)
+		{return a==b.string_view();}
+
+	template<class CharT, class Container>
+	inline bool operator!=(std::basic_string_view<CharT> a, BasicString<CharT, Container> const& b)
+		{return !(a==b);}
+#endif
 
 	template<class CharT, class Container>
 	BasicString<CharT, Container>& BasicString<CharT, Container>::append(const CharT* cstr)
@@ -120,6 +141,8 @@ namespace Analib
 		return *this;
 		}
 
+	using StringNoSso = BasicString<char, std::vector<char>>;
+	using DefaultString = BasicString<char, std::string>;
 	}
 
 #endif
