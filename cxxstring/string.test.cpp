@@ -31,17 +31,22 @@ void stringTest()
 
 	copy.append('\0');
 	assert(make_cstr(copy) == nullptr);
+	}
 
 #if __cplusplus >= 201703L
+template<class TestType>
+void stringViewTest()
+	{
+	TestType stringFromCstr{"Hello, World"};
 	auto strview = stringFromCstr.string_view();
-	auto copy2 = stringFromCstr;
-	assert(strview == copy2);
-	assert(copy2 == strview);
-	copy2.append("Hello");
-	assert(strview != copy2);
-	assert(copy2 != strview);
-#endif
+	auto copy = stringFromCstr;
+	assert(strview == copy);
+	assert(copy == strview);
+	copy.append("Hello");
+	assert(strview != copy);
+	assert(copy != strview);
 	}
+#endif
 
 int main()
 	{
