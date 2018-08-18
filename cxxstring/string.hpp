@@ -12,6 +12,27 @@
 
 namespace Analib
 	{
+	/**A class that can contain a string.
+	 *
+	 * \param CharT The type used to represent **code units**. A CharT is assumed to support the same expressions as
+	 *              the CharT parameter for std::basic_string.
+	 *
+	 * \param Container The container type used to store the code units. If c is a Container, then the following
+	 *                  expressions must be valid:
+	 *
+	 *                      c.begin()           returns an iterator to the beginning of the container
+	 *                      c.cbegin()          returns a const_iterator to the beginning of the container
+	 *                      c.end()             returns an iterator to the end of the container
+	 *                      c.cend()            returns a const_iterator to the end of the container
+	 *                      c.size()            returns the number of code units in the container
+	 *                      c.push_back(CharT)  appends one CharT to the end of the container
+	 *
+	 *                  In addition to that, c *may* also support
+	 *
+	 *                      c.data()
+	 *
+	 *                   which should return a CharT const*.
+	 */
 	template<class CharT, class Container>
 	class BasicString : private Container
 		{
@@ -22,32 +43,53 @@ namespace Analib
 			using Container::cend;
 			using Container::size;
 
+			/**A BasicString can be constructed from a C-style string.
+			 */
 			explicit BasicString(CharT const* cstr)
 				{append(cstr);}
 
+			/** A BasicString can be constructed from two InputIterator.
+			 */
 			template<class InputIterator>
 			explicit BasicString(InputIterator begin, InputIterator end)
 				{append(begin, end);}
 
+			/**Appends cstr to the BasicString, and returns *this.
+			 *
+			 * \note cstr must point to a valid C-style string.
+			 */
 			BasicString& append(CharT const* cstr);
 
+			/**Appends str to *this and returns *this.
+			 */
 			BasicString& append(BasicString const& str)
 				{return append(str.begin(), str.end());}
 
+
+			/**Appends the range [begin, end) to *this and returns *this.
+			 */
 			template<class InputIterator>
 			BasicString& append(InputIterator begin, InputIterator end);
 
+			/**Appends ch to *this and returns *this
+			 */
 			BasicString& append(CharT ch)
 				{
 				this->push_back(ch);
 				return *this;
 				}
 
+			/**Compares *this to other and returns true iff they are equal, as defined by Container.
+			*/
 			bool operator==(BasicString const& other) const
 				{return *this == static_cast<Container const&>(other);}
 
 
 #if __cplusplus >= 201703L
+			/**Returns a std::basic_string_view representing the string.
+			 *
+			 * \note This method is available iff Container supports the `data` method and the compiler supports C++17.
+			 */
 			auto string_view() const
 				{return std::basic_string_view<CharT>{Container::data(), size()};}
 #endif
@@ -67,12 +109,16 @@ namespace Analib
 		}
 
 
+	/**Converts str to a C-style string, by copying its content followed by a nul char to a new array of CharT. If str
+	 * cannot be represented as a C-style string, that is if str contains at least one nul char, the function returns
+	 * nullptr.
+	 */
 	template<class CharT, class Container>
-	std::unique_ptr<char const[]> make_cstr(BasicString<CharT, Container> const& str)
+	std::unique_ptr<CharT const[]> make_cstr(BasicString<CharT, Container> const& str)
 		{
 		if(std::find(str.begin(), str.end(), static_cast<CharT>(0)) != str.end())
 			{return nullptr;}
-		auto ret = std::make_unique<char []>(str.size() + 1);
+		auto ret = std::make_unique<CharT []>(str.size() + 1);
 		std::copy(str.begin(), str.end(), ret.get());
 		*(ret.get() + str.size()) = static_cast<CharT>(0);
 		return std::move(ret);
@@ -141,7 +187,13 @@ namespace Analib
 		return *this;
 		}
 
+	/**A string type without SSO (Small string optimization). Use this if you cannot take advantage of SSO, or the SSO
+	 * version is too large (on 64-bit libstdc++ it is 8 byte larger).
+	 */
 	using StringNoSso = BasicString<char, std::vector<char>>;
+
+	/**The default string. Basically, it uses std::string as Container.
+	 */
 	using DefaultString = BasicString<char, std::string>;
 	}
 
