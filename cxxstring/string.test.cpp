@@ -25,12 +25,13 @@ void stringTest()
 	assert(stringFromRange.append("More text") != copy);
 	assert(stringFromRange != "Hello, World");
 
-	assert(copy.append(stringFromCstr)=="Hello WorldHello, World");
+	assert(copy.append(stringFromCstr)=="Hello, WorldHello, World");
 
 	assert(strcmp(make_cstr(TestType{teststr}).get(), teststr) == 0);
 
+	assert(valid_cstr(copy));
 	copy.append('\0');
-	assert(make_cstr(copy) == nullptr);
+	assert(!valid_cstr(copy));
 	}
 
 #if __cplusplus >= 201703L

@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <cassert>
 
 namespace Analib
 	{
@@ -108,16 +109,24 @@ namespace Analib
 		return *this;
 		}
 
+	/**Checks that str is a valid C-style string. A valid C-style string must not contain any nul char.
+	*
+	* \returns True iff str is a valid C-style string.
+	*/
+	template<class CharT, class Container>
+	bool valid_cstr(BasicString<CharT, Container> const& str)
+		{return std::find(str.begin(), str.end(), static_cast<CharT>(0)) == str.end();}
 
-	/**Converts str to a C-style string, by copying its content followed by a nul char to a new array of CharT. If str
-	 * cannot be represented as a C-style string, that is if str contains at least one nul char, the function returns
-	 * nullptr.
-	 */
+
+
+	/**Converts str to a C-style string, by copying its content followed by a nul char to a new array of CharT. The
+	* behaviour is undefined if str cannot be represented as a C-style string. Use valid_cstr to check that str can
+	* be represented as a C-style string.
+	*/
 	template<class CharT, class Container>
 	std::unique_ptr<CharT const[]> make_cstr(BasicString<CharT, Container> const& str)
 		{
-		if(std::find(str.begin(), str.end(), static_cast<CharT>(0)) != str.end())
-			{return nullptr;}
+		assert(valid_cstr(str));
 		auto ret = std::make_unique<CharT []>(str.size() + 1);
 		std::copy(str.begin(), str.end(), ret.get());
 		*(ret.get() + str.size()) = static_cast<CharT>(0);
@@ -141,7 +150,7 @@ namespace Analib
 			++pos_a;
 			ch_in=*cstr;
 			}
-		return false;
+		return ch_in==static_cast<CharT>(0) && pos_a!=a.end();
 		}
 
 	template<class CharT, class Container>
@@ -150,11 +159,11 @@ namespace Analib
 
 	template<class CharT, class Container>
 	bool operator==(CharT const* cstr, BasicString<CharT, Container> const& a)
-		{return cstr == a;}
+		{return a==cstr;}
 
 	template<class CharT, class Container>
 	bool operator!=(CharT const* cstr, BasicString<CharT, Container> const& a)
-		{return cstr != a;}
+		{return a!=cstr;}
 
 #if __cplusplus>=201703L
 	template<class CharT, class Container>
