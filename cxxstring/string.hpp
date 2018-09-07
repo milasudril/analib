@@ -10,6 +10,7 @@
 #include <string>
 #include <algorithm>
 #include <cassert>
+#include <type_traits>
 
 namespace Analib
 	{
@@ -43,6 +44,18 @@ namespace Analib
 			using Container::cbegin;
 			using Container::cend;
 			using Container::size;
+
+			BasicString(char)=delete;
+			BasicString(short)=delete;
+			BasicString(int)=delete;
+			BasicString(long)=delete;
+			BasicString(long long)=delete;
+
+			BasicString(unsigned char)=delete;
+			BasicString(unsigned short)=delete;
+			BasicString(unsigned int)=delete;
+			BasicString(unsigned long)=delete;
+			BasicString(unsigned long long)=delete;
 
 			/**A BasicString can be constructed from a C-style string.
 			 */
