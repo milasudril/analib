@@ -9,6 +9,8 @@
 
 namespace Analib
 	{
+	/**\brief Helper class used to dispatch on type T
+	*/
 	template<class T>
 	struct Empty{};
 
@@ -35,12 +37,23 @@ namespace Analib
 		constexpr VtableEntries<Callback, TypeSet::size()> createVtable();
 		}
 
+	/**\brief Storage for a collection of types
+	*
+	* A TypeSet can be used to map an integer to a type and vice versa.
+	*
+	* \param Types The types to store in the collection. Each type should be distinct from each other.
+	*
+	*/
 	template<class ... Types>
 	struct TypeSet
 		{
+		/**\brief The number of types used to instanciate the TypeSet
+		*/
 		[[nodiscard]] static constexpr size_t size()
 			{return sizeof...(Types);}
 
+		/**\brief The index of type T
+		*/
 		template<class T>
 		[[nodiscard]] static constexpr auto getTypeIndex()
 			{
@@ -49,10 +62,26 @@ namespace Analib
 			return index;
 			}
 
+		/**\brief Calls cb with an overload that matches type_index, returning the
+		* value of cb. Calling this function is formally equivalent to
+		*
+		*     switch(type_index)
+		*         {
+		*         case getTypeIndex<T>():
+		*             return cb(Empty<T>);
+		*
+		*         //...
+		*         default:
+		*             return cb();
+		*         }
+		*
+		*/
 		template<class Callback>
 		[[nodiscard]] static inline auto select(size_t type_index, Callback&& cb);
 		};
 
+	/**\brief Metafunction that returns the type at index N in TypeSet T
+	*/
 	template<size_t N, class T>
 	struct GetType;
 

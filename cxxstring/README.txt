@@ -9,5 +9,3 @@ Description: The cxxstring module contains a class template
 		}
 
 For a full desciription of that class, see `string.hpp`.
-
-
