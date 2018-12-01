@@ -39,10 +39,15 @@ namespace Analib
 
 	/**\brief Storage for a collection of types
 	*
-	* A TypeSet can be used to map an integer to a type and vice versa.
+	* \param Types The types to store in the collection. Each type should be distinct from
+	*              each other.
 	*
-	* \param Types The types to store in the collection. Each type should be distinct from each other.
+	* A TypeSet can be used to map an integer to a type and vice versa. The first type is
+	* mapped to 0. That is, if `T` = `TypeSet<int, float, double>`, then
 	*
+	*     T::getTypeIndex<int>() == 0
+	*     T::getTypeIndex<float>() == 1
+	*     T::getTypeIndex<double>() == 2
 	*/
 	template<class ... Types>
 	struct TypeSet
@@ -53,6 +58,12 @@ namespace Analib
 			{return sizeof...(Types);}
 
 		/**\brief The index of type T
+		 *
+		 * This function is the inverse of the metafunction `GetType<size_t, T>`. This
+		 * means that, with `U` = `decltype(*this)`, for every pair T, N
+		 *
+		 *     U::getTypeIndex<GetType<N, U>::type>() == N
+		 *
 		*/
 		template<class T>
 		[[nodiscard]] static constexpr auto getTypeIndex()
@@ -81,6 +92,8 @@ namespace Analib
 		};
 
 	/**\brief Metafunction that returns the type at index N in TypeSet T
+	 *
+	 * This metafunction is the inverse of `T::getTypeIndex<U>()`.
 	*/
 	template<size_t N, class T>
 	struct GetType;

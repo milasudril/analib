@@ -7,9 +7,17 @@
 using TypeSetTest = Analib::TypeSet<int, float, double>;
 
 static_assert(TypeSetTest::size() == 3);
-static_assert(TypeSetTest::getTypeIndex<int>()==0);
-static_assert(TypeSetTest::getTypeIndex<float>()==1);
-static_assert(TypeSetTest::getTypeIndex<double>()==2);
+static_assert(TypeSetTest::getTypeIndex<int>() == 0);
+static_assert(TypeSetTest::getTypeIndex<float>() == 1);
+static_assert(TypeSetTest::getTypeIndex<double>() == 2);
+
+static_assert(TypeSetTest::getTypeIndex<Analib::GetType<0, TypeSetTest>::type>() == 0);
+static_assert(TypeSetTest::getTypeIndex<Analib::GetType<1, TypeSetTest>::type>() == 1);
+static_assert(TypeSetTest::getTypeIndex<Analib::GetType<2, TypeSetTest>::type>() == 2);
+
+static_assert(std::is_same_v<Analib::GetType<TypeSetTest::getTypeIndex<int>(), TypeSetTest>::type, int>);
+static_assert(std::is_same_v<Analib::GetType<TypeSetTest::getTypeIndex<float>(), TypeSetTest>::type, float>);
+static_assert(std::is_same_v<Analib::GetType<TypeSetTest::getTypeIndex<double>(), TypeSetTest>::type, double>);
 
 struct SelectTest
 	{
