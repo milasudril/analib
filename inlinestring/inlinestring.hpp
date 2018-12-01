@@ -16,6 +16,8 @@ namespace Analib
 	class InlineString
 		{
 		public:
+			InlineString() = default;
+
 			template<size_t M>
 			constexpr InlineString(CharT const (&val)[M], std::enable_if_t<(M<N), int> = 0) : m_content{}
 				{
