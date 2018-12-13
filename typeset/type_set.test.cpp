@@ -36,9 +36,6 @@ struct SelectTest
 	size_t operator()(Analib::Empty<float>)
 		{return 1;}
 
-	size_t operator()(Analib::Empty<EmptyType>)
-		{return 2;}
-
 	size_t operator()(Analib::Empty<double>)
 		{return 3;}
 

@@ -27,6 +27,18 @@ namespace Analib
 		[[nodiscard]] auto unknown_type(Callback& callback)
 			{return callback();}
 
+		template<class Callback, class Type, bool Disabled>
+		struct SelectOption;
+
+		template<class Callback, class Type>
+		struct SelectOption<Callback, Type, true>
+			{static constexpr auto callback = unknown_type<Callback>;};
+
+		template<class Callback, class Type>
+		struct SelectOption<Callback, Type, false>
+			{static constexpr auto callback = option<Callback, Type>;};
+
+
 		template<class Callback>
 		using Option = std::decay_t<decltype(unknown_type<Callback>)>;
 
@@ -134,7 +146,7 @@ namespace Analib
 			static constexpr auto vt_size = TypeSet::size();
 			static constexpr void setCallback(VtableEntries<Callback, vt_size>& vt)
 				{
-				vt[N - 1] = IsContainerOfEmpty<CurrentType>::value? unknown_type<Callback> : option<Callback, CurrentType>;
+				vt[N - 1] = SelectOption<Callback, CurrentType, IsContainerOfEmpty<CurrentType>::value>::callback;
 				return BuildVtable<Callback, TypeSet, N - 1>::setCallback(vt);
 				}
 			};
