@@ -57,6 +57,8 @@ namespace Analib
 			BasicString(unsigned long)=delete;
 			BasicString(unsigned long long)=delete;
 
+			BasicString() = default;
+
 			/**A BasicString can be constructed from a C-style string.
 			 */
 			explicit BasicString(CharT const* cstr)
@@ -107,6 +109,15 @@ namespace Analib
 			auto string_view() const
 				{return std::basic_string_view<CharT>{Container::data(), size()};}
 #endif
+
+			auto data()
+				{return Container::data();}
+
+			auto data() const
+				{return Container::data();}
+
+			void resize(size_t size)
+				{Container::resize(size);}
 		};
 
 

@@ -111,7 +111,7 @@ namespace Analib
 		{
 		template<class TypeSet, class T, size_t index = TypeSet::size()>
 		struct TypeIndex
-			{
+				{
 			static constexpr auto value = std::is_same_v<typename GetType<index - 1, TypeSet>::type, T> ?
 				index - 1 : TypeIndex<TypeSet, T, index - 1>::value;
 			};
@@ -119,7 +119,13 @@ namespace Analib
 		struct TypeIndex<TypeSet, T, 0>
 			{static constexpr auto value = TypeSet::size(); };
 
+		template<class T, class Enable=int>
+		struct IsContainerOfEmpty
+			{static constexpr auto value = std::is_empty_v<T>;};
 
+		template<class T>
+		struct IsContainerOfEmpty<T, decltype(std::declval<typename T::value_type>(), 0)>
+			{static constexpr auto value = IsContainerOfEmpty<typename T::value_type>::value;};
 
 		template<class Callback, class TypeSet, size_t N=TypeSet::size()>
 		struct BuildVtable
@@ -128,7 +134,7 @@ namespace Analib
 			static constexpr auto vt_size = TypeSet::size();
 			static constexpr void setCallback(VtableEntries<Callback, vt_size>& vt)
 				{
-				vt[N - 1] = option<Callback, CurrentType>;
+				vt[N - 1] = IsContainerOfEmpty<CurrentType>::value? unknown_type<Callback> : option<Callback, CurrentType>;
 				return BuildVtable<Callback, TypeSet, N - 1>::setCallback(vt);
 				}
 			};
