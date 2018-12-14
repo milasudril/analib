@@ -39,6 +39,8 @@ namespace Analib
 	class BasicString : private Container
 		{
 		public:
+			using value_type = CharT;
+
 			using Container::begin;
 			using Container::end;
 			using Container::cbegin;
