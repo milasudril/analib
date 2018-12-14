@@ -14,6 +14,14 @@ namespace Analib
 	template<class T>
 	struct Empty{};
 
+	template<class T, class Enable=int>
+	struct IsContainerOfEmpty
+		{static constexpr auto value = std::is_empty_v<T>;};
+
+	template<class T>
+	struct IsContainerOfEmpty<T, decltype(std::declval<typename T::value_type>(), 0)>
+		{static constexpr auto value = IsContainerOfEmpty<typename T::value_type>::value;};
+
 	namespace ts_detail
 		{
 		template<class TypeSet, class T, size_t index>
@@ -130,14 +138,6 @@ namespace Analib
 		template<class TypeSet, class T>
 		struct TypeIndex<TypeSet, T, 0>
 			{static constexpr auto value = TypeSet::size(); };
-
-		template<class T, class Enable=int>
-		struct IsContainerOfEmpty
-			{static constexpr auto value = std::is_empty_v<T>;};
-
-		template<class T>
-		struct IsContainerOfEmpty<T, decltype(std::declval<typename T::value_type>(), 0)>
-			{static constexpr auto value = IsContainerOfEmpty<typename T::value_type>::value;};
 
 		template<class Callback, class TypeSet, size_t N=TypeSet::size()>
 		struct BuildVtable

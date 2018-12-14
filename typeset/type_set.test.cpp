@@ -7,7 +7,7 @@
 
 using EmptyType = std::vector<Analib::Empty<int>>;
 
-static_assert(Analib::ts_detail::IsContainerOfEmpty<EmptyType>::value);
+static_assert(Analib::IsContainerOfEmpty<EmptyType>::value);
 
 using TypeSetTest = Analib::TypeSet<int, float, EmptyType, double>;
 
