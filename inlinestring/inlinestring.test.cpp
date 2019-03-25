@@ -2,6 +2,8 @@
 //@	"targets":[{"name":"inlinestring.test","type":"application","autorun":1}]
 //@	}
 
+#undef NDEBUG
+
 #include "inlinestring.hpp"
 
 #include <cassert>
