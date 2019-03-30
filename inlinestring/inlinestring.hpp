@@ -30,6 +30,15 @@ namespace Analib
 					{m_content[k] = val[k];}
 				}
 
+			template<class Iter, class ExceptionHandler>
+			InlineString(Iter a, Iter b, ExceptionHandler&& eh) : m_content{}
+				{
+				if(static_cast<size_t>(std::distance(a, b)) >= N)
+					{eh.stringTooLong(a, b);}
+				else
+					{std::copy(a, b, begin());}
+				}
+
 			constexpr InlineString(CharT const (&val)[N]) : m_content{}
 				{
 				for(size_t k = 0; k<N; ++k)
